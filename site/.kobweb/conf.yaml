@@ -1,0 +1,14 @@
+site:
+  title: "LiteraryLinc"
+
+server:
+  files:
+    dev:
+      contentRoot: "build/processedResources/js/main/public"
+      script: "build/kotlin-webpack/js/developmentExecutable/literarylinc.js"
+      api: "build/libs/literarylinc.jar"
+    prod:
+      script: "build/kotlin-webpack/js/productionExecutable/literarylinc.js"
+      siteRoot: ".kobweb/site"
+
+  port: 8080
