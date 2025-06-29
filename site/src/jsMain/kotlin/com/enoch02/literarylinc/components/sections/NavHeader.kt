@@ -100,9 +100,9 @@ enum class SideMenuState {
 @Composable
 fun NavHeader() {
     Row(NavHeaderStyle.toModifier(), verticalAlignment = Alignment.CenterVertically) {
-        Link("https://kobweb.varabyte.com") {
+        Link("https://github.com/Enoch02/LiteraryLinc/") {
             // Block display overrides inline display of the <img> tag, so it calculates centering better
-            Image("/kobweb-logo.png", "Kobweb Logo", Modifier.height(2.cssRem).display(DisplayStyle.Block))
+            Image("/icon-512.png", "LiteraryLinc Icon", Modifier.height(2.cssRem).display(DisplayStyle.Block))
         }
 
         Spacer()

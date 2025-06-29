@@ -34,7 +34,7 @@ class PageLayoutData(val title: String)
 fun PageLayout(ctx: PageContext, content: @Composable ColumnScope.() -> Unit) {
     val data = ctx.data.getValue<PageLayoutData>()
     LaunchedEffect(data.title) {
-        document.title = "Kobweb - ${data.title}"
+        document.title = "LiteraryLinc - ${data.title}"
     }
 
     Box(
