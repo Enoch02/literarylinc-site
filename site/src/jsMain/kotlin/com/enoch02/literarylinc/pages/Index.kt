@@ -1,10 +1,18 @@
 package com.enoch02.literarylinc.pages
 
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
+import com.enoch02.literarylinc.components.layouts.PageLayoutData
+import com.enoch02.literarylinc.components.widgets.AnimatedImageSwitcher
+import com.enoch02.literarylinc.components.widgets.IconButton
+import com.varabyte.kobweb.compose.css.BoxShadow
 import com.varabyte.kobweb.compose.css.StyleVariable
+import com.varabyte.kobweb.compose.css.functions.LinearGradient
+import com.varabyte.kobweb.compose.css.functions.linearGradient
 import com.varabyte.kobweb.compose.foundation.layout.Box
 import com.varabyte.kobweb.compose.foundation.layout.Column
 import com.varabyte.kobweb.compose.foundation.layout.Row
+import com.varabyte.kobweb.compose.foundation.layout.Spacer
+import com.varabyte.kobweb.compose.ui.Alignment
 import com.varabyte.kobweb.compose.ui.Modifier
 import com.varabyte.kobweb.compose.ui.graphics.Color
 import com.varabyte.kobweb.compose.ui.graphics.Colors
@@ -17,26 +25,24 @@ import com.varabyte.kobweb.core.init.InitRouteContext
 import com.varabyte.kobweb.core.layout.Layout
 import com.varabyte.kobweb.core.rememberPageContext
 import com.varabyte.kobweb.silk.components.forms.Button
-import com.varabyte.kobweb.silk.components.navigation.Link
-import com.varabyte.kobweb.silk.components.text.SpanText
+import com.varabyte.kobweb.silk.components.graphics.Image
+import com.varabyte.kobweb.silk.components.icons.ArrowBackIcon
+import com.varabyte.kobweb.silk.components.icons.ArrowForwardIcon
 import com.varabyte.kobweb.silk.style.CssStyle
+import com.varabyte.kobweb.silk.style.animation.Keyframes
 import com.varabyte.kobweb.silk.style.base
 import com.varabyte.kobweb.silk.style.breakpoint.Breakpoint
 import com.varabyte.kobweb.silk.style.breakpoint.displayIfAtLeast
-import com.varabyte.kobweb.silk.style.toAttrs
 import com.varabyte.kobweb.silk.style.toModifier
-import com.varabyte.kobweb.silk.theme.colors.ColorMode
 import com.varabyte.kobweb.silk.theme.colors.ColorPalettes
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.web.css.cssRem
-import org.jetbrains.compose.web.css.fr
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.css.vh
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Text
-import com.enoch02.literarylinc.HeadlineTextStyle
-import com.enoch02.literarylinc.SubheadlineTextStyle
-import com.enoch02.literarylinc.components.layouts.PageLayoutData
-import com.enoch02.literarylinc.toSitePalette
+import kotlin.time.Duration.Companion.seconds
 
 // Container that has a tagline and grid on desktop, and just the tagline on mobile
 val HeroContainerStyle = CssStyle {
@@ -80,64 +86,78 @@ fun initHomePage(ctx: InitRouteContext) {
 @Layout(".components.layouts.PageLayout")
 @Composable
 fun HomePage() {
-    Row(HeroContainerStyle.toModifier()) {
-        Box {
-            val sitePalette = ColorMode.current.toSitePalette()
+    //TODO: fix widths for mobile
+    Row {
+        Column(modifier = Modifier.gap(1.cssRem), horizontalAlignment = Alignment.CenterHorizontally) {
+            Image(
+                src = "/feature_graphic.png",
+                description = "LiteraryLinc Graphic",
+                modifier = Modifier.height(15.cssRem)
+            )
 
-            Column(Modifier.gap(2.cssRem)) {
-                Div(HeadlineTextStyle.toAttrs()) {
-                    SpanText(
-                        "Use this template as your starting point for ", Modifier.color(
-                            when (ColorMode.current) {
-                                ColorMode.LIGHT -> Colors.Black
-                                ColorMode.DARK -> Colors.White
-                            }
-                        )
-                    )
-                    SpanText(
-                        "Kobweb",
-                        Modifier
-                            .color(sitePalette.brand.accent)
-                            // Use a shadow so this light-colored word is more visible in light mode
-                            .textShadow(0.px, 0.px, blurRadius = 0.5.cssRem, color = Colors.Gray)
-                    )
+            val ctx = rememberPageContext()
+            Button(
+                onClick = {
+                    //TODO: replace with universal apk github link
+                    ctx.router.navigateTo("https://github.com/Enoch02/LiteraryLinc/releases/download/v0.0.14/Literarylinc-universal-release.apk")
+                },
+                colorPalette = ColorPalettes.Blue,
+                content = {
+                    Text("Download APK")
                 }
-
-                Div(SubheadlineTextStyle.toAttrs()) {
-                    SpanText("You can read the ")
-                    Link("/about", "About")
-                    SpanText(" page for more information.")
-                }
-
-                val ctx = rememberPageContext()
-                Button(onClick = {
-                    // Change this click handler with your call-to-action behavior
-                    // here. Link to an order page? Open a calendar UI? Play a movie?
-                    // Up to you!
-                    ctx.router.tryRoutingTo("/about")
-                }, colorPalette = ColorPalettes.Blue) {
-                    Text("This could be your CTA")
-                }
-            }
+            )
         }
 
-        Div(
-            HomeGridStyle
-            .toModifier()
-            .displayIfAtLeast(Breakpoint.MD)
-            .grid {
-                rows { repeat(3) { size(1.fr) } }
-                columns { repeat(5) { size(1.fr) } }
+        Spacer()
+
+        Row(
+            modifier = Modifier.displayIfAtLeast(Breakpoint.MD),
+            verticalAlignment = Alignment.CenterVertically,
+            content = {
+                val coroutineScope = rememberCoroutineScope()
+                val screenShotUrls = listOf(
+                    "/app_screenshot1.jpg",
+                    "/app_screenshot2.jpg",
+                    "/app_screenshot3.jpg",
+                    "/app_screenshot4.jpg",
+                )
+                var currentImage by remember { mutableStateOf(0) }
+                val getNextImage = {
+                    if (currentImage == screenShotUrls.lastIndex) {
+                        currentImage = 0
+                    } else {
+                        currentImage++
+                    }
+                }
+
+                LaunchedEffect(currentImage) {
+                    delay(5.seconds)
+                    getNextImage()
+                }
+
+                IconButton(
+                    onClick = {
+                        if (currentImage == 0) {
+                            currentImage = screenShotUrls.lastIndex
+                        } else {
+                            currentImage--
+                        }
+                    },
+                    content = { ArrowBackIcon() }
+                )
+
+                Box(
+                    modifier = Modifier.boxShadow(blurRadius = 5.px, spreadRadius = 3.px, color = Colors.DarkGray),
+                    content = {
+                        AnimatedImageSwitcher(screenShotUrls[currentImage])
+                    }
+                )
+
+                IconButton(
+                    onClick = { getNextImage() },
+                    content = { ArrowForwardIcon() }
+                )
             }
-            .toAttrs()
-        ) {
-            val sitePalette = ColorMode.current.toSitePalette()
-            GridCell(sitePalette.brand.primary, 1, 1, 2, 2)
-            GridCell(ColorPalettes.Monochrome._600, 1, 3)
-            GridCell(ColorPalettes.Monochrome._100, 1, 4, width = 2)
-            GridCell(sitePalette.brand.accent, 2, 3, width = 2)
-            GridCell(ColorPalettes.Monochrome._300, 2, 5)
-            GridCell(ColorPalettes.Monochrome._800, 3, 1, width = 5)
-        }
+        )
     }
 }
