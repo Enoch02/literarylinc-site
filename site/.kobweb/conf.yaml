@@ -1,5 +1,6 @@
 site:
   title: "LiteraryLinc"
+  basepath: "literarylinc-site"
 
 server:
   files:
