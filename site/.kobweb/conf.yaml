@@ -1,6 +1,6 @@
 site:
   title: "LiteraryLinc"
-  basepath: "literarylinc-site"
+  basePath: "literarylinc-site"
 
 server:
   files:

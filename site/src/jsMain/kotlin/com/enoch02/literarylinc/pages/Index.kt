@@ -114,7 +114,6 @@ fun HomePage() {
             modifier = Modifier.displayIfAtLeast(Breakpoint.MD),
             verticalAlignment = Alignment.CenterVertically,
             content = {
-                val coroutineScope = rememberCoroutineScope()
                 val screenShotUrls = listOf(
                     "/app_screenshot1.jpg",
                     "/app_screenshot2.jpg",
